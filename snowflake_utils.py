@@ -10,6 +10,7 @@ SNOWFLAKE_SCHEMA = st.secrets["SCHEMA"]
 SNOWFLAKE_WAREHOUSE = st.secrets["WAREHOUSE"]
 SNOWFLAKE_STAGE = "docs"  # Replace with your Snowflake stage name
 
+
 @st.cache_resource
 def get_snowflake_session():
     """Establish and cache a Snowflake session."""
@@ -26,4 +27,12 @@ def get_snowflake_session():
         return session
     except Exception as e:
         st.error(f"Failed to create Snowflake session: {str(e)}")
-        raise 
+        raise
+
+
+# try:
+#     session = get_snowflake_session()
+#     print(session)
+# except Exception as e:
+#     st.error(f"Failed to create Snowflake session: {str(e)}")
+#     raise

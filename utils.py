@@ -3,22 +3,24 @@ import os
 import datetime
 import random
 import string
-import snowflake.connector
 import streamlit as st
 from markitdown import MarkItDown
 from snowflake_utils import SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA, SNOWFLAKE_STAGE
 
 # if 'folder_path' not in st.session_state:
-#     st.session_state['folder_path'] = "resume/2025-01-14/nN1N2gY0" 
+#     st.session_state['folder_path'] = "resume/2025-01-17/OS1VsLBk"
+
 
 @st.cache_resource
 def get_snowflake_connection():
     conn = st.connection("snowflake")
     return conn.session()
 
+
 def sanitize_filename(file_name):
     """Sanitize the filename for compatibility with Snowflake."""
     return re.sub(r"[^a-zA-Z0-9_.]", "_", file_name)
+
 
 def upload_to_snowflake(file_name, file_data):
     """Upload a file to a Snowflake stage and insert metadata into the database."""
@@ -31,22 +33,24 @@ def upload_to_snowflake(file_name, file_data):
 
         # Generate folder path with current date and random string
         current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        
+
         # Check if random string is already generated for the session
         if "random_string" not in st.session_state:
-            st.session_state["random_string"] = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-        
+            st.session_state["random_string"] = ''.join(
+                random.choices(string.ascii_letters + string.digits, k=8))
+
         random_string = st.session_state["random_string"]
         folder_path = f"resume/{current_date}/{random_string}"
 
         st.session_state['folder_path'] = folder_path
         st.query_params.folder_path = folder_path
-        
+
         # Specify the target folder in the stage
         stage_path = f"@{SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}.{SNOWFLAKE_STAGE}/{folder_path}"
         put_query = f"PUT file://{os.path.abspath(temp_file_path)} {stage_path} AUTO_COMPRESS=FALSE"
         session.sql(put_query).collect()
-        st.session_state["uploaded_files"].append(f"{folder_path}/{sanitized_file_name}")
+        st.session_state["uploaded_files"].append(
+            f"{folder_path}/{sanitized_file_name}")
 
         # Refresh stage before inserting metadata
         refresh_query = f"ALTER STAGE {SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}.{SNOWFLAKE_STAGE} REFRESH;"
