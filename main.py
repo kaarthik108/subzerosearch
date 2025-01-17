@@ -5,9 +5,10 @@ from dataclasses import dataclass
 from snowflake.core import Root
 from snowflake.cortex import complete
 from snowflake_utils import SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA
-from utils import upload_to_snowflake
+from utils import upload_to_snowflake, render_sidebar
 import time
 from pathlib import Path
+from snowflake_utils import SnowflakeConnection
 
 # Configure logging
 logging.basicConfig(
@@ -16,6 +17,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AppConfig:
     """Application configuration settings"""
@@ -23,47 +25,49 @@ class AppConfig:
     LAYOUT: str = "centered"
     INITIAL_SIDEBAR_STATE: str = "expanded"
     MODELS: List[str] = None
-    
+
     def __post_init__(self):
         self.MODELS = [
             "mistral-large2",
         ]
 
-class SnowflakeConnection:
-    """Manages Snowflake database connection"""
-    
-    @staticmethod
-    @st.cache_resource
-    def get_connection():
-        """Establish and return Snowflake connection"""
-        try:
-            conn = st.connection("snowflake")
-            return conn.session()
-        except Exception as e:
-            logger.error(f"Failed to connect to Snowflake: {str(e)}")
-            raise ConnectionError(f"Could not connect to Snowflake: {str(e)}")
 
 class SessionStateManager:
     """Manages Streamlit session state"""
-    
+
     @staticmethod
     def initialize_session_state():
         """Initialize session state variables"""
         default_states = {
             "chat_mode": False,
             "uploaded_files": [],
-            "messages": [],
             "folder_path": None,
             "uploading": False
         }
-        
+
+        # Initialize basic session states
         for key, default_value in default_states.items():
             if key not in st.session_state:
                 st.session_state[key] = default_value
 
+        # Initialize messages with a simple welcome conversation
+        if "messages" not in st.session_state:
+            st.session_state["messages"] = [
+                {
+                    "role": "user",
+                    "content": "Hi there! 👋",
+                },
+                {
+                    "role": "assistant",
+                    "content": "✨ Great! Your resumes are ready to explore. Ask me anything about them, or check out the Auto Insights page for AI-powered analysis of all your resumes! ✨",
+                    "source_documents": {}
+                }
+            ]
+
+
 class UIManager:
     """Manages UI components and styling"""
-    
+
     @staticmethod
     @st.cache_resource
     def load_css(file_name: str):
@@ -72,22 +76,24 @@ class UIManager:
             css_path = Path(file_name)
             if not css_path.exists():
                 raise FileNotFoundError(f"CSS file not found: {file_name}")
-                
+
             with open(css_path) as f:
-                st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+                st.markdown(f"<style>{f.read()}</style>",
+                            unsafe_allow_html=True)
         except Exception as e:
             logger.error(f"Failed to load CSS: {str(e)}")
             raise
 
+
 class FileUploadHandler:
     """Handles file upload operations"""
-    
+
     @staticmethod
     def process_uploaded_files(uploaded_files) -> None:
         """Process and upload files to Snowflake"""
         if not uploaded_files:
             return
-            
+
         try:
             for file in uploaded_files:
                 file_data = file.read()
@@ -105,9 +111,10 @@ class FileUploadHandler:
             )
             raise
 
+
 class ChatHandler:
     """Handles chat operations and interactions"""
-    
+
     def __init__(self, snowflake_session, slide_window: int = 5):
         self.root = Root(snowflake_session)
         self.search_service = (
@@ -138,7 +145,7 @@ class ChatHandler:
             {question}
             </question>
         """
-        
+
         try:
             summary = complete(
                 self.config.MODELS[0],
@@ -156,9 +163,10 @@ class ChatHandler:
         try:
             # Get chat history and create context-aware query
             chat_history = self.get_chat_history()
-            
+
             if chat_history:
-                context_query = self.summarize_with_history(chat_history, prompt)
+                context_query = self.summarize_with_history(
+                    chat_history, prompt)
                 logger.info("Using summarized context query for search")
             else:
                 context_query = prompt
@@ -166,7 +174,8 @@ class ChatHandler:
 
             search_response = self._perform_search(context_query)
             context_str = self._build_context(search_response.results)
-            self._generate_response(prompt, context_str, search_response.to_json(), chat_history)
+            self._generate_response(
+                prompt, context_str, search_response.to_json(), chat_history)
         except Exception as e:
             logger.error(f"Error processing chat message: {str(e)}")
             st.error(f"Error occurred: {str(e)}")
@@ -237,9 +246,10 @@ class ChatHandler:
             "source_documents": source_documents
         })
 
+
 class ATSApplication:
     """Main ATS application class"""
-    
+
     def __init__(self):
         self.config = AppConfig()
         self.setup_app()
@@ -282,7 +292,7 @@ class ATSApplication:
     def _handle_file_upload(self, uploaded_files):
         """Handle file upload process"""
         button_container = st.empty()
-        
+
         if not st.session_state.get('uploading', False):
             if button_container.button("Upload Resumes"):
                 st.session_state.uploading = True
@@ -306,7 +316,7 @@ class ATSApplication:
     def render_chat_ui(self):
         """Render chat interface"""
         self._render_header()
-        self._render_sidebar()
+        render_sidebar()
         self._display_chat_history()
         self._handle_chat_input()
 
@@ -324,20 +334,6 @@ class ATSApplication:
                 </div>
             </div>
         """, unsafe_allow_html=True)
-
-    def _render_sidebar(self):
-        """Render sidebar content"""
-        with st.sidebar:
-            st.markdown(
-                '<h3 class="sidebar-title">Uploaded Files</h3>',
-                unsafe_allow_html=True
-            )
-            if st.session_state["uploaded_files"]:
-                for file in st.session_state["uploaded_files"]:
-                    st.write(f"- {file}")
-            else:
-                st.write("No files uploaded yet.")
-
 
     def _display_chat_history(self):
         """Display chat history"""
@@ -374,7 +370,8 @@ class ATSApplication:
 
             if "messages" not in st.session_state:
                 st.session_state.messages = []
-            st.session_state.messages.append({"role": "user", "content": prompt})
+            st.session_state.messages.append(
+                {"role": "user", "content": prompt})
 
             self.chat_handler.process_chat_message(prompt)
 
@@ -390,6 +387,7 @@ class ATSApplication:
             logger.error(f"Application error: {str(e)}")
             st.error("An unexpected error occurred. Please try again later.")
 
+
 def main():
     """Main entry point"""
     try:
@@ -398,6 +396,7 @@ def main():
     except Exception as e:
         logger.critical(f"Critical application error: {str(e)}")
         st.error("A critical error occurred. Please contact support.")
+
 
 if __name__ == "__main__":
     main()

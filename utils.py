@@ -125,3 +125,28 @@ prompt = """
         ]
     }
     """
+
+
+def render_sidebar():
+    """Render sidebar content"""
+    with st.sidebar:
+        st.markdown("""
+            <style>
+                [data-testid="stSidebarNav"] {
+                    display: none;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+        st.page_link("main.py", label="/Chat")
+        st.page_link("pages/auto_insights.py", label="/Auto Insights")
+        st.markdown(
+            '<h3 class="sidebar-title">Uploaded Files</h3>',
+            unsafe_allow_html=True
+        )
+        if st.session_state.get("uploaded_files"):
+            for file in st.session_state["uploaded_files"]:
+                file_name = file.split('/')[-1]
+                st.write(f"- {file_name}")
+        else:
+            st.write("No files uploaded yet.")
