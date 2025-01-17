@@ -1,0 +1,2 @@
+snowflake==0.8.0
+snowflake-ml-python==1.5.1
