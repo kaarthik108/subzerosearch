@@ -124,7 +124,7 @@ class FileUploadHandler:
 class ChatHandler:
     """Handles chat operations and interactions"""
 
-    def __init__(self, snowflake_session, slide_window: int = 5):
+    def __init__(self, snowflake_session, config: AppConfig, slide_window: int = 5):
         self.root = Root(snowflake_session)
         self.search_service = (
             self.root
@@ -133,6 +133,7 @@ class ChatHandler:
             .cortex_search_services["CC_SEARCH_SERVICE_CS"]
         )
         self.slide_window = slide_window
+        self.config = config
 
     def get_chat_history(self) -> List[Dict]:
         """Get recent chat history based on slide window"""
@@ -264,7 +265,10 @@ class ATSApplication:
         self.setup_app()
         SessionStateManager.initialize_session_state()
         UIManager.load_css("styles.css")
-        self.chat_handler = ChatHandler(SnowflakeConnection.get_connection())
+        self.chat_handler = ChatHandler(
+            SnowflakeConnection.get_connection(),
+            config=self.config
+        )
 
     def setup_app(self):
         """Configure initial app settings"""
