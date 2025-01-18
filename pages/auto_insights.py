@@ -3,11 +3,12 @@ import plotly.express as px
 import pandas as pd
 from snowflake.cortex import complete
 import json
-from main import my_service
 import re
 from utils import prompt, render_sidebar
 from snowflake_utils import SnowflakeConnection
 import logging
+from snowflake.core import Root
+from snowflake_utils import SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA
 
 st.set_page_config(
     page_title="Resume Analytics",
@@ -25,11 +26,19 @@ class ResumeAnalytics:
         self.model = model
         self.prompt = prompt
         self.session = None
+        self.search_service = None
 
     @st.cache_resource
     def get_snowflake_connection(_self):
         logging.info("Establishing Snowflake connection.")
         _self.session = SnowflakeConnection().get_connection()
+        root = Root(_self.session)
+        _self.search_service = (
+            root
+            .databases[SNOWFLAKE_DATABASE]
+            .schemas[SNOWFLAKE_SCHEMA]
+            .cortex_search_services["CC_SEARCH_SERVICE_CS"]
+        )
         return _self.session
 
     @st.cache_data(ttl=4000)
@@ -59,7 +68,7 @@ class ResumeAnalytics:
                 status_text.text("Analyzing resume contents...")
                 filter_conditions = [
                     {"@eq": {"RELATIVE_PATH": path}} for path in file_paths]
-                search_response = my_service.search(
+                search_response = _self.search_service.search(
                     query=_self.prompt,
                     columns=["chunk"],
                     filter={
