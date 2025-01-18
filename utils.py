@@ -5,7 +5,7 @@ import random
 import string
 import streamlit as st
 from markitdown import MarkItDown
-from snowflake_utils import SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA, SNOWFLAKE_STAGE
+from snowflake_utils import SnowflakeConnection
 
 # if 'folder_path' not in st.session_state:
 #     st.session_state['folder_path'] = "resume/2025-01-17/OS1VsLBk"
@@ -46,14 +46,14 @@ def upload_to_snowflake(file_name, file_data):
         st.query_params.folder_path = folder_path
 
         # Specify the target folder in the stage
-        stage_path = f"@{SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}.{SNOWFLAKE_STAGE}/{folder_path}"
+        stage_path = f"@{SnowflakeConnection.config.DATABASE}.{SnowflakeConnection.config.SCHEMA}.{SnowflakeConnection.config.STAGE}/{folder_path}"
         put_query = f"PUT file://{os.path.abspath(temp_file_path)} {stage_path} AUTO_COMPRESS=FALSE"
         session.sql(put_query).collect()
         st.session_state["uploaded_files"].append(
             f"{folder_path}/{sanitized_file_name}")
 
         # Refresh stage before inserting metadata
-        refresh_query = f"ALTER STAGE {SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}.{SNOWFLAKE_STAGE} REFRESH;"
+        refresh_query = f"ALTER STAGE {SnowflakeConnection.config.DATABASE}.{SnowflakeConnection.config.SCHEMA}.{SnowflakeConnection.config.STAGE} REFRESH;"
         session.sql(refresh_query).collect()
 
         # Use MarkItDown to parse the document

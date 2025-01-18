@@ -2,9 +2,7 @@ import logging
 import streamlit as st
 from typing import List, Dict, Optional
 from dataclasses import dataclass
-from snowflake.core import Root
 from snowflake.cortex import complete
-from snowflake_utils import SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA
 from utils import upload_to_snowflake, render_sidebar
 import time
 from pathlib import Path
@@ -125,13 +123,8 @@ class ChatHandler:
     """Handles chat operations and interactions"""
 
     def __init__(self, snowflake_session, config: AppConfig, slide_window: int = 5):
-        self.root = Root(snowflake_session)
-        self.search_service = (
-            self.root
-            .databases[SNOWFLAKE_DATABASE]
-            .schemas[SNOWFLAKE_SCHEMA]
-            .cortex_search_services["CC_SEARCH_SERVICE_CS"]
-        )
+        self.search_service = SnowflakeConnection.get_search_service(
+            snowflake_session)
         self.slide_window = slide_window
         self.config = config
 
