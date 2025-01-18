@@ -331,12 +331,18 @@ class ATSApplication:
         st.markdown("""
             <div class="header-section">
                 <div class="chat-header-content">
+                    <div class="brand-logo">❄️ SubZeroSearch</div>
                     <h1 class="chat-title">
-                        Transform your <span class="gradient-text">hiring</span> process
+                        Find Your Perfect Candidate with <span class="gradient-text">AI-Powered Precision</span>
                     </h1>
                     <p class="chat-subtitle">
-                        AI-powered talent matching that understands the nuances of every resume
+                        Instantly find the perfect candidates using AI-powered resume analysis
                     </p>
+                    <div class="header-badges">
+                        <span class="badge">Smart Matching</span>
+                        <span class="badge">Instant Results</span>
+                        <span class="badge">AI-Powered</span>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)

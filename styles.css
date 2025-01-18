@@ -3,6 +3,7 @@
   padding-top: 0;
   padding-bottom: 0;
   max-width: 100%;
+  margin-top: 0;
 }
 
 /* Hide Streamlit's default spinner */
@@ -139,56 +140,95 @@
 
 /* Additional CSS for chat_ui */
 .header-section {
-  padding: 2rem 2rem;
+  padding: 1rem 2rem;
   text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(240, 249, 255, 0.2) 0%,
+    rgba(240, 249, 255, 0) 100%
+  );
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  margin-top: 0;
 }
 
 .chat-header-content {
-  max-width: 780px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-.chat-title {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 56px;
-  font-weight: 500;
-  line-height: 1.1;
-  color: #1a1a1a;
-  margin-bottom: 24px;
+.brand-logo {
+  font-family: "Inter", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 2rem;
   letter-spacing: -0.02em;
 }
 
+.chat-title {
+  font-family: "Inter", sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
 .gradient-text {
-  background: linear-gradient(to right, #f59e0b, #ec4899);
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-weight: 400;
-  letter-spacing: normal;
+  font-weight: 800;
 }
 
 .chat-subtitle {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 18px;
+  font-family: "Inter", sans-serif;
+  font-size: 1.25rem;
   line-height: 1.6;
-  color: #666666;
-  margin: 0 auto;
-  max-width: 540px;
+  color: #475569;
+  margin: 0 auto 2rem;
+  max-width: 640px;
   font-weight: 400;
-  letter-spacing: -0.01em;
 }
 
-@media (max-width: 640px) {
+.header-badges {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.badge {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
   .header-section {
-    padding: 1.5rem 1.5rem;
+    padding: 2rem 1rem;
   }
 
   .chat-title {
-    font-size: 40px;
+    font-size: 2.5rem;
   }
 
   .chat-subtitle {
-    font-size: 16px;
+    font-size: 1.125rem;
+    padding: 0 1rem;
+  }
+
+  .header-badges {
+    flex-wrap: wrap;
+    padding: 0 1rem;
   }
 }
 
@@ -363,4 +403,10 @@ button[kind="secondary"] {
 }
 section[data-testid="stSidebar"] > div > ul:first-child {
   display: none;
+}
+
+.stMainBlockContainer {
+  padding-top: 1rem !important;
+  margin-top: 0 !important;
+  gap: 0 !important;
 }
