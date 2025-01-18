@@ -137,14 +137,6 @@
   display: none;
 }
 
-.user-img {
-  width: 100%;
-  height: 100%;
-  background-image: url("https://mk7iyaq7oqz5ihbw.public.blob.vercel-storage.com/pngegg-FyQPBN1QqOBSGwaFpRQmhQKs0MhCD1.png");
-  background-size: cover;
-  background-position: center;
-}
-
 /* Additional CSS for chat_ui */
 .header-section {
   padding: 2rem 2rem;

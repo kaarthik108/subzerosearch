@@ -39,9 +39,9 @@ class SessionStateManager:
     def initialize_session_state():
         """Initialize session state variables"""
         default_states = {
-            "chat_mode": False,
+            "chat_mode": True,
             "uploaded_files": [],
-            "folder_path": None,
+            "folder_path": "resume/2025-01-17/OS1VsLBk",
             "uploading": False
         }
 
@@ -80,6 +80,15 @@ class UIManager:
             with open(css_path) as f:
                 st.markdown(f"<style>{f.read()}</style>",
                             unsafe_allow_html=True)
+            st.markdown(f"""<style>.user-img {{
+                            width: 100%;
+                            height: 100%;
+                            background-image: url('{st.secrets.AVATAR_URL}');
+                            background-size: cover;
+                            background-position: center;
+                             }}</style>""",
+                        unsafe_allow_html=True)
+
         except Exception as e:
             logger.error(f"Failed to load CSS: {str(e)}")
             raise
@@ -135,9 +144,9 @@ class ChatHandler:
         """Summarize question with chat history context"""
         prompt = f"""
             Based on the chat history below and the question, generate a query that extends the question
-            with the chat history provided. The query should be in natural language. 
+            with the chat history provided. The query should be in natural language.
             Answer with only the query. Do not add any explanation.
-            
+
             <chat_history>
             {chat_history}
             </chat_history>
@@ -204,7 +213,7 @@ class ChatHandler:
     def _generate_response(prompt: str, context_str: str, source_documents: Dict, chat_history: List[Dict]):
         """Generate and display chat response"""
         full_prompt = f"""
-        You are a helpful AI assistant for recruiters. Your task is to provide clear, concise, and relevant information about candidates based on their resumes. 
+        You are a helpful AI assistant for recruiters. Your task is to provide clear, concise, and relevant information about candidates based on their resumes.
         Use the following context to answer the question, and if you're not sure about something, please say so.
         Consider the chat history when providing your response to maintain conversation continuity.
         Do not mention the context or chat history used in your answer.
@@ -362,7 +371,7 @@ class ATSApplication:
             st.markdown(f"""
                 <div class="message-wrapper user">
                     <div class="avatar user-avatar">
-                        <img src="https://mk7iyaq7oqz5ihbw.public.blob.vercel-storage.com/pngegg-FyQPBN1QqOBSGwaFpRQmhQKs0MhCD1.png" alt="User">
+                        <div class="user-img"></div>
                     </div>
                     <div class="message-content">{prompt}</div>
                 </div>
