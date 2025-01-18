@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AppConfig:
     """Application configuration settings"""
-    PAGE_TITLE: str = "ATS for Recruiters"
+    PAGE_TITLE: str = "SubZeroSearch - ATS for Recruiters"
     LAYOUT: str = "centered"
     INITIAL_SIDEBAR_STATE: str = "expanded"
     MODELS: List[str] = None
@@ -278,7 +278,7 @@ class ATSApplication:
         """Render file upload interface"""
         st.markdown('<div class="upload-container">', unsafe_allow_html=True)
         st.markdown(
-            '<div class="title">ATS for Recruiters</div>',
+            '<div class="title">SubZeroSearch - ATS for Recruiters</div>',
             unsafe_allow_html=True
         )
         st.markdown(
