@@ -293,44 +293,42 @@ class ATSApplication:
         )
 
         if uploaded_files:
-            self._handle_file_upload(uploaded_files)
+            # Wrap the button in a container and use columns for centering
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                button_container = st.empty()
+                success_messages = st.empty()
 
-        st.markdown('</div>', unsafe_allow_html=True)
+                if not st.session_state.get('uploading', False):
+                    if button_container.button("Upload Resumes"):
+                        st.session_state.uploading = True
+                        button_container.empty()
 
-    def _handle_file_upload(self, uploaded_files):
-        """Handle file upload process"""
-        button_container = st.empty()
-        success_messages = st.empty()  # New container for success messages
-
-        if not st.session_state.get('uploading', False):
-            if button_container.button("Upload Resumes"):
-                st.session_state.uploading = True
-                button_container.empty()
-
-                spinner = st.empty()
-                spinner.markdown(
-                    '<div class="loading-spinner"></div>',
-                    unsafe_allow_html=True
-                )
-
-                try:
-                    for file in uploaded_files:
-                        file_data = file.read()
-                        upload_to_snowflake(file.name, file_data)
-                        logger.info(f"Successfully uploaded {file.name}")
-                        success_messages.markdown(
-                            f'<div class="success-message">✨ Successfully uploaded {file.name}</div>',
+                        spinner = st.empty()
+                        spinner.markdown(
+                            '<div class="loading-spinner"></div>',
                             unsafe_allow_html=True
                         )
 
-                    time.sleep(1)
-                    success_messages.empty()  # Clear success messages before transition
-                    st.session_state["chat_mode"] = True
-                    st.session_state["indexing"] = True
-                    st.rerun()
-                finally:
-                    spinner.empty()
-                    st.session_state.uploading = False
+                        try:
+                            for file in uploaded_files:
+                                file_data = file.read()
+                                upload_to_snowflake(file.name, file_data)
+                                logger.info(
+                                    f"Successfully uploaded {file.name}")
+                                success_messages.markdown(
+                                    f'<div class="success-message">✨ Successfully uploaded {file.name}</div>',
+                                    unsafe_allow_html=True
+                                )
+
+                            time.sleep(1)
+                            success_messages.empty()  # Clear success messages before transition
+                            st.session_state["chat_mode"] = True
+                            st.session_state["indexing"] = True
+                            st.rerun()
+                        finally:
+                            spinner.empty()
+                            st.session_state.uploading = False
 
     def render_chat_ui(self):
         """Render chat interface"""
