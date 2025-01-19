@@ -163,6 +163,16 @@
   color: #0f172a;
   margin-bottom: 2rem;
   letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logo-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 
 .chat-title {
@@ -275,6 +285,12 @@
 
 .assistant-avatar {
   color: #1565c0;
+}
+
+.assistant-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .message-content {

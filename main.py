@@ -235,7 +235,9 @@ class ChatHandler:
             response += chunk
             response_placeholder.markdown(f"""
                 <div class="message-wrapper assistant">
-                    <div class="avatar assistant-avatar">❄️</div>
+                    <div class="avatar assistant-avatar">
+                        <img src="{st.secrets['LOGO_URL']}" alt="Assistant Logo"/>
+                    </div>
                     <div class="message-content">{response}</div>
                 </div>
             """, unsafe_allow_html=True)
@@ -328,10 +330,12 @@ class ATSApplication:
 
     def _render_header(self):
         """Render chat header"""
-        st.markdown("""
+        st.markdown(f"""
             <div class="header-section">
                 <div class="chat-header-content">
-                    <div class="brand-logo">❄️ SubZeroSearch</div>
+                    <div class="brand-logo">
+                        <img src="{st.secrets['LOGO_URL']}" class="logo-image" alt="SubZeroSearch Logo"/> SubZeroSearch
+                    </div>
                     <h1 class="chat-title">
                         Find Your Perfect Candidate with <span class="gradient-text">AI-Powered Precision</span>
                     </h1>
@@ -351,7 +355,8 @@ class ATSApplication:
         """Display chat history"""
         for message in st.session_state.get("messages", []):
             role_class = "user" if message["role"] == "user" else "assistant"
-            avatar_content = '<div class="user-img"></div>' if message["role"] == "user" else "❄️"
+            avatar_content = '<div class="user-img"></div>' if message[
+                "role"] == "user" else f'<img src="{st.secrets["LOGO_URL"]}" alt="Assistant Logo"/>'
             avatar_class = "user-avatar" if message["role"] == "user" else "assistant-avatar"
 
             st.markdown(f"""
