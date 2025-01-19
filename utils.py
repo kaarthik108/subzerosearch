@@ -5,16 +5,10 @@ import random
 import string
 import streamlit as st
 from markitdown import MarkItDown
-from snowflake_utils import SnowflakeConnection
+from snowflake_utils import SnowflakeConfig, SnowflakeConnection
 
 # if 'folder_path' not in st.session_state:
 #     st.session_state['folder_path'] = "resume/2025-01-17/OS1VsLBk"
-
-
-@st.cache_resource
-def get_snowflake_connection():
-    conn = st.connection("snowflake")
-    return conn.session()
 
 
 def sanitize_filename(file_name):
@@ -25,7 +19,7 @@ def sanitize_filename(file_name):
 def upload_to_snowflake(file_name, file_data):
     """Upload a file to a Snowflake stage and insert metadata into the database."""
     try:
-        session = get_snowflake_connection()
+        session = SnowflakeConnection.get_connection()
         sanitized_file_name = sanitize_filename(file_name)
         temp_file_path = f"temp_{sanitized_file_name}"
         with open(temp_file_path, "wb") as f:
@@ -46,14 +40,14 @@ def upload_to_snowflake(file_name, file_data):
         st.query_params.folder_path = folder_path
 
         # Specify the target folder in the stage
-        stage_path = f"@{SnowflakeConnection.config.DATABASE}.{SnowflakeConnection.config.SCHEMA}.{SnowflakeConnection.config.STAGE}/{folder_path}"
+        stage_path = f"@{SnowflakeConfig.DATABASE}.{SnowflakeConfig.SCHEMA}.{SnowflakeConfig.STAGE}/{folder_path}"
         put_query = f"PUT file://{os.path.abspath(temp_file_path)} {stage_path} AUTO_COMPRESS=FALSE"
         session.sql(put_query).collect()
         st.session_state["uploaded_files"].append(
             f"{folder_path}/{sanitized_file_name}")
 
         # Refresh stage before inserting metadata
-        refresh_query = f"ALTER STAGE {SnowflakeConnection.config.DATABASE}.{SnowflakeConnection.config.SCHEMA}.{SnowflakeConnection.config.STAGE} REFRESH;"
+        refresh_query = f"ALTER STAGE {SnowflakeConfig.DATABASE}.{SnowflakeConfig.SCHEMA}.{SnowflakeConfig.STAGE} REFRESH;"
         session.sql(refresh_query).collect()
 
         # Use MarkItDown to parse the document

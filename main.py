@@ -37,9 +37,9 @@ class SessionStateManager:
     def initialize_session_state():
         """Initialize session state variables"""
         default_states = {
-            "chat_mode": True,
+            "chat_mode": False,
             "uploaded_files": [],
-            "folder_path": "resume/2025-01-17/OS1VsLBk",
+            "folder_path": None,
             "uploading": False
         }
 
