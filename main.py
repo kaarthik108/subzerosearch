@@ -21,7 +21,7 @@ class AppConfig:
     """Application configuration settings"""
     PAGE_TITLE: str = "SubZeroSearch - ATS for Recruiters"
     LAYOUT: str = "centered"
-    INITIAL_SIDEBAR_STATE: str = "expanded"
+    INITIAL_SIDEBAR_STATE: str = "collapsed"
     MODELS: List[str] = None
 
     def __post_init__(self):
@@ -300,6 +300,7 @@ class ATSApplication:
     def _handle_file_upload(self, uploaded_files):
         """Handle file upload process"""
         button_container = st.empty()
+        success_messages = st.empty()  # New container for success messages
 
         if not st.session_state.get('uploading', False):
             if button_container.button("Upload Resumes"):
@@ -313,9 +314,19 @@ class ATSApplication:
                 )
 
                 try:
-                    FileUploadHandler.process_uploaded_files(uploaded_files)
+                    for file in uploaded_files:
+                        file_data = file.read()
+                        upload_to_snowflake(file.name, file_data)
+                        logger.info(f"Successfully uploaded {file.name}")
+                        success_messages.markdown(
+                            f'<div class="success-message">✨ Successfully uploaded {file.name}</div>',
+                            unsafe_allow_html=True
+                        )
+
                     time.sleep(1)
+                    success_messages.empty()  # Clear success messages before transition
                     st.session_state["chat_mode"] = True
+                    st.session_state["indexing"] = True
                     st.rerun()
                 finally:
                     spinner.empty()
@@ -375,6 +386,27 @@ class ATSApplication:
 
     def _handle_chat_input(self):
         """Handle chat input and responses"""
+        if st.session_state.get("indexing", False):
+            with st.container():
+                st.markdown("""
+                    <div class="indexing-container">
+                        <div class="indexing-spinner"></div>
+                        <div class="indexing-messages">
+                            <h3>🚀 Initializing Search</h3>
+                            <div class="message-content">
+                                ⚡ Snowflake Cortex Search indexing will take up to 60 seconds... Hold on!
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+
+                time.sleep(60)
+                st.session_state["indexing"] = False
+                st.rerun()
+
         if prompt := st.chat_input("Ask something about the resumes..."):
             st.markdown(f"""
                 <div class="message-wrapper user">
