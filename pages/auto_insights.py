@@ -24,7 +24,6 @@ class ResumeAnalytics:
         self.session = None
         self.search_service = None
 
-    @st.cache_resource
     def get_snowflake_connection(_self):
         logger.info("Establishing Snowflake connection.")
         _self.session = SnowflakeConnection.get_connection()
@@ -32,7 +31,6 @@ class ResumeAnalytics:
             _self.session)
         return _self.session
 
-    @st.cache_data(ttl=4000)
     def get_ai_insights(_self):
         """Fetch AI-generated insights using Snowflake Cortex."""
         progress_bar = st.progress(0)
@@ -100,7 +98,6 @@ class ResumeAnalytics:
             logger.error(f"Error during AI insights retrieval: {str(e)}")
             raise e
 
-    @st.cache_data
     def clean_json_response(_self, response):
         """Clean the AI response to extract only valid JSON content."""
         response = re.sub(r'```json\s*', '', response)
@@ -123,7 +120,6 @@ class ResumeAnalytics:
             logger.error(f"Invalid JSON structure: {str(e)}")
             raise ValueError(f"Invalid JSON structure: {str(e)}")
 
-    @st.cache_data
     def create_skills_chart(_self, skills):
         skill_df = pd.DataFrame(skills.items(), columns=["Skill", "Count"])
         skill_df = skill_df.nlargest(
@@ -148,7 +144,6 @@ class ResumeAnalytics:
         )
         return fig
 
-    @st.cache_data
     def create_experience_chart(_self, candidates):
         experience_data = {c["name"]: c["experience"] for c in candidates}
         fig = px.pie(
@@ -165,7 +160,6 @@ class ResumeAnalytics:
         )
         return fig
 
-    @st.cache_data
     def create_projects_chart(_self, candidates):
         project_data = {c["name"]: c["projects"] for c in candidates}
         fig = px.bar(
