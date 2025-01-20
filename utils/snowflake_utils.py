@@ -1,11 +1,9 @@
 import streamlit as st
-import logging
 from typing import Any
 from snowflake.core import Root
+from utils.logging_utils import setup_logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 
 class SnowflakeConfig:
@@ -68,16 +66,11 @@ class SnowflakeConnection:
             raise
 
 
-# Usage example:
 if __name__ == "__main__":
     try:
-        # Get session
         session = SnowflakeConnection.get_connection()
 
-        # Get search service using session
         search_service = SnowflakeConnection.get_search_service(session)
-
-        # Use session and search_service here
 
     except Exception as e:
         logger.error("Failed to initialize Snowflake services: %s", str(e))

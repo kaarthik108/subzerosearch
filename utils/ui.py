@@ -1,8 +1,8 @@
 import streamlit as st
 from pathlib import Path
-import logging
+from utils.logging_utils import setup_logging
 
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 
 class UIManager:

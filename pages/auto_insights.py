@@ -7,16 +7,14 @@ import re
 from utils.shared import prompt, render_sidebar, get_file_paths
 from utils.snowflake_utils import SnowflakeConnection
 from utils.chat import AppConfig
-import logging
+from utils.logging_utils import setup_logging
 
 st.set_page_config(
     page_title="Resume Analytics",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-# Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = setup_logging()
 
 
 class ResumeAnalytics:
@@ -28,7 +26,7 @@ class ResumeAnalytics:
 
     @st.cache_resource
     def get_snowflake_connection(_self):
-        logging.info("Establishing Snowflake connection.")
+        logger.info("Establishing Snowflake connection.")
         _self.session = SnowflakeConnection.get_connection()
         _self.search_service = SnowflakeConnection.get_search_service(
             _self.session)
@@ -99,7 +97,7 @@ class ResumeAnalytics:
         except Exception as e:
             status_text.error(f"Error during processing: {str(e)}")
             progress_bar.empty()
-            logging.error(f"Error during AI insights retrieval: {str(e)}")
+            logger.error(f"Error during AI insights retrieval: {str(e)}")
             raise e
 
     @st.cache_data
@@ -113,7 +111,7 @@ class ResumeAnalytics:
         end_idx = response.rfind('}')
 
         if start_idx == -1 or end_idx == -1:
-            logging.error("No valid JSON object found in response")
+            logger.error("No valid JSON object found in response")
             raise ValueError("No valid JSON object found in response")
 
         json_str = response[start_idx:end_idx + 1]
@@ -122,7 +120,7 @@ class ResumeAnalytics:
             parsed_json = json.loads(json_str)
             return parsed_json
         except json.JSONDecodeError as e:
-            logging.error(f"Invalid JSON structure: {str(e)}")
+            logger.error(f"Invalid JSON structure: {str(e)}")
             raise ValueError(f"Invalid JSON structure: {str(e)}")
 
     @st.cache_data
@@ -242,12 +240,12 @@ class ResumeAnalytics:
 
         except Exception as e:
             st.error(f"Error processing data: {str(e)}")
-            logging.error(f"Error displaying resume analytics: {str(e)}")
+            logger.error(f"Error displaying resume analytics: {str(e)}")
 
 
 if __name__ == "__main__":
     if 'folder_path' in st.session_state and st.session_state['folder_path']:
-        logging.info("Starting Resume Analytics Dashboard.")
+        logger.info("Starting Resume Analytics Dashboard.")
         analytics = ResumeAnalytics(
             folder_path=st.session_state['folder_path'],
             prompt=prompt

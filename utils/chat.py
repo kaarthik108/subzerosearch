@@ -146,7 +146,6 @@ class ChatHandler:
         response_placeholder = st.empty()
         response = ""
 
-        # Stream the response
         for chunk in complete(
             'mistral-large2',
             full_prompt,
@@ -167,13 +166,11 @@ class ChatHandler:
                 </div>
             """, unsafe_allow_html=True)
 
-        # Update the last message in session state with the full response
         st.session_state.messages.append({
             "role": "assistant",
             "content": response,
             "source_documents": source_documents
         })
 
-        # Show source documents for the current message
         with st.expander("📄 View Source Documents"):
             st.json(source_documents)

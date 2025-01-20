@@ -6,7 +6,9 @@ import string
 import streamlit as st
 from markitdown import MarkItDown
 from utils.snowflake_utils import SnowflakeConfig, SnowflakeConnection
-import logging
+from utils.logging_utils import setup_logging
+
+logger = setup_logging()
 
 # if 'folder_path' not in st.session_state:
 #     st.session_state['folder_path'] = "resume/2025-01-17/OS1VsLBk"
@@ -26,10 +28,8 @@ def upload_to_snowflake(file_name, file_data):
         with open(temp_file_path, "wb") as f:
             f.write(file_data)
 
-        # Generate folder path with current date and random string
         current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
-        # Check if random string is already generated for the session
         if "random_string" not in st.session_state:
             st.session_state["random_string"] = ''.join(
                 random.choices(string.ascii_letters + string.digits, k=8))
@@ -40,22 +40,18 @@ def upload_to_snowflake(file_name, file_data):
         st.session_state['folder_path'] = folder_path
         st.query_params.folder_path = folder_path
 
-        # Specify the target folder in the stage
         stage_path = f"@{SnowflakeConfig.DATABASE}.{SnowflakeConfig.SCHEMA}.{SnowflakeConfig.STAGE}/{folder_path}"
         put_query = f"PUT file://{os.path.abspath(temp_file_path)} {stage_path} AUTO_COMPRESS=FALSE"
         session.sql(put_query).collect()
         st.session_state["uploaded_files"].append(
             f"{folder_path}/{sanitized_file_name}")
 
-        # Refresh stage before inserting metadata
         refresh_query = f"ALTER STAGE {SnowflakeConfig.DATABASE}.{SnowflakeConfig.SCHEMA}.{SnowflakeConfig.STAGE} REFRESH;"
         session.sql(refresh_query).collect()
 
-        # Use MarkItDown to parse the document
         md = MarkItDown()
         parsed_content = md.convert(temp_file_path)
 
-        # Insert metadata into the database
         insert_query = f"""
         INSERT INTO docs_chunks_table (relative_path, size, file_url, scoped_file_url, chunk)
         SELECT relative_path, 
@@ -74,13 +70,12 @@ def upload_to_snowflake(file_name, file_data):
     finally:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
-        # No need to explicitly close session as Streamlit manages it
 
 
 @st.cache_data(ttl=4000)
 def get_file_paths(folder_path):
     """Retrieve file paths from the database."""
-    logging.info("Retrieving file paths from the database.")
+    logger.info("Retrieving file paths from the database.")
     session = SnowflakeConnection.get_connection()
     list_query = f"""
     SELECT DISTINCT relative_path 
@@ -168,7 +163,6 @@ def render_sidebar():
         st.markdown("<br>", unsafe_allow_html=True)
 
         if st.button("Reset", key="reset_button"):
-            # Clear all query parameters
             st.query_params.clear()
             st.session_state["chat_mode"] = False
             st.session_state["uploaded_files"] = []

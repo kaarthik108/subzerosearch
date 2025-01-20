@@ -6,12 +6,9 @@ from utils.snowflake_utils import SnowflakeConnection
 from utils.ui import UIManager
 from utils.chat import ChatHandler, AppConfig
 from utils.state import SessionStateManager
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+from utils.logging_utils import setup_logging
+
+logger = setup_logging()
 
 
 class ATSApplication:
@@ -125,7 +122,6 @@ class ATSApplication:
         messages = st.session_state.get("messages", [])
 
         for i, message in enumerate(messages):
-            # Skip displaying source documents for the welcome message
             is_welcome_message = i <= 1  # First two messages are the welcome conversation
 
             role_class = "user" if message["role"] == "user" else "assistant"
