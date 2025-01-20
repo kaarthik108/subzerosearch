@@ -4,8 +4,9 @@ import pandas as pd
 from snowflake.cortex import complete
 import json
 import re
-from utils import prompt, render_sidebar, get_file_paths
-from snowflake_utils import SnowflakeConnection
+from utils.shared import prompt, render_sidebar, get_file_paths
+from utils.snowflake_utils import SnowflakeConnection
+from utils.chat import AppConfig
 import logging
 
 st.set_page_config(
@@ -19,9 +20,8 @@ logging.basicConfig(level=logging.INFO,
 
 
 class ResumeAnalytics:
-    def __init__(self, folder_path, model, prompt):
+    def __init__(self, folder_path, prompt):
         self.folder_path = folder_path
-        self.model = model
         self.prompt = prompt
         self.session = None
         self.search_service = None
@@ -81,7 +81,7 @@ class ResumeAnalytics:
                 """
 
                 response = complete(
-                    model=_self.model,
+                    model=AppConfig.RESPONSE_MODEL,
                     prompt=base_prompt + "\n\n" + "Context from resumes: " + context_str,
                     options=options,
                     session=session
@@ -250,7 +250,6 @@ if __name__ == "__main__":
         logging.info("Starting Resume Analytics Dashboard.")
         analytics = ResumeAnalytics(
             folder_path=st.session_state['folder_path'],
-            model="mistral-large2",
             prompt=prompt
         )
         analytics.display_resume_analytics()

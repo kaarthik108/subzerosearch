@@ -5,7 +5,7 @@ import random
 import string
 import streamlit as st
 from markitdown import MarkItDown
-from snowflake_utils import SnowflakeConfig, SnowflakeConnection
+from utils.snowflake_utils import SnowflakeConfig, SnowflakeConnection
 import logging
 
 # if 'folder_path' not in st.session_state:
