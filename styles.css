@@ -26,8 +26,10 @@
   background: linear-gradient(135deg, #0ea5e9, #2563eb, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 3rem;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
   margin: 1rem 0;
   padding: 0 1rem;
   animation: gradientFlow 8s ease infinite;
@@ -259,34 +261,33 @@
 .chat-header-content {
   max-width: 900px;
   margin: 0 auto;
-}
-
-.brand-logo {
-  font-family: "Inter", sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 2rem;
-  letter-spacing: -0.02em;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 10px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo-image {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .chat-title {
   font-family: "Inter", sans-serif;
-  font-size: 3.5rem;
+  font-size: 2rem;
   font-weight: 800;
   line-height: 1.1;
   color: #0f172a;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   letter-spacing: -0.03em;
 }
 
@@ -697,4 +698,9 @@ section[data-testid="stSidebar"] > div {
   100% {
     transform: translateX(100%);
   }
+}
+
+/* Hide the default Streamlit app header */
+.stAppHeader {
+  display: none !important;
 }

@@ -37,9 +37,9 @@ class SessionStateManager:
     def initialize_session_state():
         """Initialize session state variables"""
         default_states = {
-            "chat_mode": False,
+            "chat_mode": True,
             "uploaded_files": [],
-            "folder_path": None,
+            "folder_path": "resume/2025-01-17/OS1VsLBk",
             "uploading": False
         }
 
@@ -277,7 +277,12 @@ class ATSApplication:
         """Render file upload interface"""
         st.markdown('<div class="upload-container">', unsafe_allow_html=True)
         st.markdown(
-            '<div class="title">SubZeroSearch - ATS for Recruiters</div>',
+            f'''
+            <div class="brand-logo">
+                <img src="{st.secrets['LOGO_URL']}" class="logo-image" alt="SubZeroSearch Logo"/>
+                <span class="title">SubZeroSearch</span>
+            </div>
+            ''',
             unsafe_allow_html=True
         )
         st.markdown(
@@ -343,18 +348,8 @@ class ATSApplication:
             <div class="header-section">
                 <div class="chat-header-content">
                     <div class="brand-logo">
-                        <img src="{st.secrets['LOGO_URL']}" class="logo-image" alt="SubZeroSearch Logo"/> SubZeroSearch
-                    </div>
-                    <h1 class="chat-title">
-                        Find Your Perfect Candidate with <span class="gradient-text">AI-Powered Precision</span>
-                    </h1>
-                    <p class="chat-subtitle">
-                        Instantly find the perfect candidates using AI-powered resume analysis
-                    </p>
-                    <div class="header-badges">
-                        <span class="badge">Smart Matching</span>
-                        <span class="badge">Instant Results</span>
-                        <span class="badge">AI-Powered</span>
+                        <img src="{st.secrets['LOGO_URL']}" class="logo-image" alt="SubZeroSearch Logo"/>
+                        <span class="chat-title">SubZeroSearch</span>
                     </div>
                 </div>
             </div>
