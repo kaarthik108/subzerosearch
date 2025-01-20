@@ -6,6 +6,7 @@ import string
 import streamlit as st
 from markitdown import MarkItDown
 from snowflake_utils import SnowflakeConfig, SnowflakeConnection
+import logging
 
 # if 'folder_path' not in st.session_state:
 #     st.session_state['folder_path'] = "resume/2025-01-17/OS1VsLBk"
@@ -74,6 +75,21 @@ def upload_to_snowflake(file_name, file_data):
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
         # No need to explicitly close session as Streamlit manages it
+
+
+@st.cache_data(ttl=4000)
+def get_file_paths(folder_path):
+    """Retrieve file paths from the database."""
+    logging.info("Retrieving file paths from the database.")
+    session = SnowflakeConnection.get_connection()
+    list_query = f"""
+    SELECT DISTINCT relative_path 
+    FROM docs_chunks_table 
+    WHERE relative_path LIKE '{folder_path}/%';
+    """
+    result = session.sql(list_query).collect()
+    file_paths = [row['RELATIVE_PATH'] for row in result]
+    return file_paths
 
 
 prompt = """

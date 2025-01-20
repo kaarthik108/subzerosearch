@@ -4,7 +4,7 @@ import pandas as pd
 from snowflake.cortex import complete
 import json
 import re
-from utils import prompt, render_sidebar
+from utils import prompt, render_sidebar, get_file_paths
 from snowflake_utils import SnowflakeConnection
 import logging
 
@@ -49,13 +49,7 @@ class ResumeAnalytics:
 
             try:
                 status_text.text("Retrieving resume data...")
-                list_query = f"""
-                SELECT DISTINCT relative_path 
-                FROM docs_chunks_table 
-                WHERE relative_path LIKE '{_self.folder_path}/%';
-                """
-                result = session.sql(list_query).collect()
-                file_paths = [row['RELATIVE_PATH'] for row in result]
+                file_paths = get_file_paths(_self.folder_path)
                 progress_bar.progress(60)
 
                 status_text.text("Analyzing resume contents...")

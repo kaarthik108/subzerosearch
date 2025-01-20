@@ -3,7 +3,7 @@ import streamlit as st
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 from snowflake.cortex import complete
-from utils import upload_to_snowflake, render_sidebar
+from utils import upload_to_snowflake, render_sidebar, get_file_paths
 import time
 from pathlib import Path
 from snowflake_utils import SnowflakeConnection
@@ -39,7 +39,7 @@ class SessionStateManager:
         default_states = {
             "chat_mode": True,
             "uploaded_files": [],
-            "folder_path": "resume/2025-01-17/OS1VsLBk",
+            "folder_path": "resume/2025-01-20/jMfhwsDA",
             "uploading": False
         }
 
@@ -89,33 +89,6 @@ class UIManager:
 
         except Exception as e:
             logger.error(f"Failed to load CSS: {str(e)}")
-            raise
-
-
-class FileUploadHandler:
-    """Handles file upload operations"""
-
-    @staticmethod
-    def process_uploaded_files(uploaded_files) -> None:
-        """Process and upload files to Snowflake"""
-        if not uploaded_files:
-            return
-
-        try:
-            for file in uploaded_files:
-                file_data = file.read()
-                upload_to_snowflake(file.name, file_data)
-                logger.info(f"Successfully uploaded {file.name}")
-                st.markdown(
-                    f'<div class="success-message">✨ Successfully uploaded {file.name}</div>',
-                    unsafe_allow_html=True
-                )
-        except Exception as e:
-            logger.error(f"Error uploading files: {str(e)}")
-            st.markdown(
-                f'<div class="error-message">❌ Error uploading files: {str(e)}</div>',
-                unsafe_allow_html=True
-            )
             raise
 
 
@@ -186,10 +159,24 @@ class ChatHandler:
     def _perform_search(self, query: str):
         """Perform search operation"""
         try:
+            file_paths = get_file_paths(
+                st.session_state.get("folder_path", "")
+            )
+            logger.info(f"File paths: {file_paths}")
+
+            filter_conditions = [
+                {"@eq": {"RELATIVE_PATH": path}} for path in file_paths
+            ]
+
+            # Ensure filter is always an array
+            if len(filter_conditions) == 1:
+                filter_conditions = [filter_conditions[0]]
+
             return self.search_service.search(
                 query=query,
                 columns=["chunk"],
-                limit=5
+                limit=10,
+                filter={"@or": filter_conditions}
             )
         except Exception as e:
             logger.error(f"Search operation failed: {str(e)}")
@@ -221,35 +208,41 @@ class ChatHandler:
 
         User Question: {prompt}
         """
-
+        print("\n\nsession state messages\n\n", st.session_state.messages)
         response_placeholder = st.empty()
-        sources_placeholder = st.empty()
         response = ""
 
+        # Stream the response
         for chunk in complete(
             'mistral-large2',
             full_prompt,
             session=SnowflakeConnection.get_connection(),
             stream=True
         ):
+            # Clear the loading placeholder on first chunk
+            if not response:
+                st.session_state.get('loading_placeholder', st.empty()).empty()
+
             response += chunk
             response_placeholder.markdown(f"""
                 <div class="message-wrapper assistant">
                     <div class="avatar assistant-avatar">
                         <img src="{st.secrets['LOGO_URL']}" alt="Assistant Logo"/>
                     </div>
-                    <div class="message-content">{response}</div>
+                    <div class="message-content">{response if chunk else "Loading..."}</div>
                 </div>
             """, unsafe_allow_html=True)
 
-        with sources_placeholder.expander("📄 View Source Documents"):
-            st.json(source_documents)
-
+        # Update the last message in session state with the full response
         st.session_state.messages.append({
             "role": "assistant",
             "content": response,
             "source_documents": source_documents
         })
+
+        # Show source documents for the current message
+        with st.expander("📄 View Source Documents"):
+            st.json(source_documents)
 
 
 class ATSApplication:
@@ -357,7 +350,12 @@ class ATSApplication:
 
     def _display_chat_history(self):
         """Display chat history"""
-        for message in st.session_state.get("messages", []):
+        messages = st.session_state.get("messages", [])
+
+        for i, message in enumerate(messages):
+            # Skip displaying source documents for the welcome message
+            is_welcome_message = i <= 1  # First two messages are the welcome conversation
+
             role_class = "user" if message["role"] == "user" else "assistant"
             avatar_content = '<div class="user-img"></div>' if message[
                 "role"] == "user" else f'<img src="{st.secrets["LOGO_URL"]}" alt="Assistant Logo"/>'
@@ -370,7 +368,7 @@ class ATSApplication:
                 </div>
             """, unsafe_allow_html=True)
 
-            if message["role"] == "assistant":
+            if message["role"] == "assistant" and not is_welcome_message:
                 with st.expander("📄 View Source Documents"):
                     if "source_documents" in message and message["source_documents"]:
                         st.json(message["source_documents"])
@@ -401,6 +399,7 @@ class ATSApplication:
                 st.rerun()
 
         if prompt := st.chat_input("Ask something about the resumes..."):
+            # Display user message
             st.markdown(f"""
                 <div class="message-wrapper user">
                     <div class="avatar user-avatar">
@@ -410,11 +409,25 @@ class ATSApplication:
                 </div>
             """, unsafe_allow_html=True)
 
+            # Append user message to session state
             if "messages" not in st.session_state:
                 st.session_state.messages = []
             st.session_state.messages.append(
                 {"role": "user", "content": prompt})
 
+            placeholder_msg = st.empty()
+            st.session_state['loading_placeholder'] = placeholder_msg
+            placeholder_msg.markdown(
+                f"""
+                <div class="message-wrapper assistant">
+                    <div class="avatar assistant-avatar">
+                        <img src="{st.secrets['LOGO_URL']}" alt="Assistant Logo"/>
+                    </div>
+                    <div class="message-content">Loading...</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # Process the chat message
             self.chat_handler.process_chat_message(prompt)
 
     def run(self):
