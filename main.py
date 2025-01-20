@@ -67,7 +67,7 @@ class ATSApplication:
 
                 if not st.session_state.get('uploading', False):
                     # Use Streamlit's button and center it using columns
-                    if st.button("Upload Resumes", key="upload_button", disabled=st.session_state.get('uploading', False)):
+                    if st.button("Upload Resumes", key="upload_button", disabled=st.session_state.get('chat_mode', False)):
                         st.session_state.uploading = True
                         button_container.empty()
 

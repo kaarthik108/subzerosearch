@@ -32,6 +32,7 @@ class ResumeAnalytics:
             _self.session)
         return _self.session
 
+    @st.cache_data(ttl=4000)
     def get_ai_insights(_self):
         """Fetch AI-generated insights using Snowflake Cortex."""
         progress_bar = st.progress(0)

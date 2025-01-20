@@ -167,4 +167,5 @@ def render_sidebar():
             st.session_state["chat_mode"] = False
             st.session_state["uploaded_files"] = []
             st.session_state["folder_path"] = None
+            st.cache_data.clear()
             st.rerun()
