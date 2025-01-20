@@ -1,11 +1,9 @@
-/* Reset Streamlit container padding and remove empty space */
 .main .block-container {
-  padding: 0 !important;
-  max-width: 100% !important;
-  margin: 0 !important;
+  padding: 1rem 2rem !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
 }
 
-/* Hide Streamlit's default spinner */
 .stSpinner {
   display: none !important;
 }
@@ -113,15 +111,26 @@
 .stFileUploader:hover::before {
   opacity: 1;
 }
+.stColumns {
+  margin: 0 auto !important;
+  max-width: 800px !important;
+}
+
+[data-testid="column"] {
+  width: 100% !important;
+  flex: 1 1 auto !important;
+}
 
 .stFileUploader:hover {
+  margin: 2.5rem auto !important;
+  max-width: 100% !important;
+  width: 100% !important;
   border-color: #2563eb !important;
   background: linear-gradient(145deg, #f0f9ff, #e0f2fe) !important;
   transform: translateY(-4px);
   box-shadow: 0 20px 50px rgba(37, 99, 235, 0.12) !important;
 }
 
-/* File uploader container */
 .stFileUploader > div {
   position: relative !important;
   display: flex !important;
@@ -130,18 +139,15 @@
   min-height: 200px !important;
 }
 
-/* Drag and drop area */
 .stFileUploader > div:first-child {
   margin-top: 2rem !important;
 }
 
-/* Upload text styling */
 .stFileUploader [data-testid="stMarkdownContainer"] {
   position: relative !important;
   margin-bottom: 1rem !important;
 }
 
-/* Browse files button container */
 .stFileUploader > div:last-child {
   position: relative !important;
   bottom: auto !important;
@@ -149,26 +155,12 @@
   margin-bottom: 1rem !important;
 }
 
-/* Enhanced button styles */
 .stButton > button {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
   background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
   color: white !important;
-  padding: 1rem 2.5rem !important;
-  border: none !important;
-  border-radius: 16px !important;
-  margin-top: 2rem;
-  font-weight: 600;
-  font-size: 1.1rem;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.25);
-  width: auto;
-  min-width: 220px;
-  opacity: 0;
-  animation: fadeIn 0.8s ease-out forwards;
-  animation-delay: 0.7s;
-  position: relative;
-  overflow: hidden;
 }
 
 .stButton > button::before {
@@ -197,7 +189,6 @@
   transform: translateY(-2px);
 }
 
-/* Enhanced loading spinner */
 .loading-spinner {
   width: 60px;
   height: 60px;
@@ -208,7 +199,6 @@
   margin: 30px auto;
 }
 
-/* Enhanced success/error messages */
 .success-message {
   padding: 1.2rem;
   background: linear-gradient(45deg, #22c55e, #16a34a);
@@ -240,12 +230,10 @@
   }
 }
 
-/* Hide any default Streamlit elements that might cause spacing */
 .css-1dp5vir {
   display: none !important;
 }
 
-/* Additional CSS for chat_ui */
 .header-section {
   padding: 1rem 2rem;
   text-align: center;
@@ -368,7 +356,6 @@
   }
 }
 
-/* Sidebar Styling */
 .sidebar-title {
   color: #1565c0;
   font-size: 1.2rem;
@@ -378,7 +365,6 @@
   border-bottom: 2px solid #e3f2fd;
 }
 
-/* Message Styles */
 .message-wrapper {
   display: flex;
   margin: 1.2rem 0;
@@ -440,7 +426,6 @@
   border-top-right-radius: 5px;
 }
 
-/* Source Document Styling */
 div[data-testid="stExpander"] {
   border: none;
   box-shadow: none;
@@ -484,11 +469,11 @@ div[data-testid="stExpander"] pre {
   word-break: break-word;
 }
 
-button[kind="secondary"] {
+/* button[kind="secondary"] {
   border: none !important;
   background-color: transparent !important;
   box-shadow: none !important;
-}
+} */
 
 /* Chat input styling */
 /* .stTextInput > div > div {
@@ -506,7 +491,6 @@ button[kind="secondary"] {
 
 } */
 
-/* Update the user avatar styling */
 .user-avatar img {
   background-image: url("https://mk7iyaq7oqz5ihbw.public.blob.vercel-storage.com/pngegg-FyQPBN1QqOBSGwaFpRQmhQKs0MhCD1.png");
   background-size: cover;
@@ -553,19 +537,16 @@ section[data-testid="stSidebar"] > div > ul:first-child {
   gap: 0 !important;
 }
 
-/* Remove the z-index forcing */
 .stFileUploader * {
   position: relative;
 }
 
-/* Ensure clean stacking without forced z-index */
 .stMainBlockContainer {
   padding-top: 0 !important;
   margin-top: 0 !important;
   gap: 0 !important;
 }
 
-/* Aggressively remove all top spacing and headers */
 .block-container {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
@@ -596,7 +577,6 @@ section[data-testid="stSidebar"] > div {
   margin-top: 0 !important;
 }
 
-/* Indexing Animation Styles */
 .indexing-container {
   background: linear-gradient(145deg, #ffffff, #f8fafc);
   border-radius: 16px;
@@ -675,7 +655,6 @@ section[data-testid="stSidebar"] > div {
   }
 }
 
-/* Shimmer effect */
 .indexing-container::after {
   content: "";
   position: absolute;
@@ -700,7 +679,6 @@ section[data-testid="stSidebar"] > div {
   }
 }
 
-/* Hide the default Streamlit app header */
 .stAppHeader {
   display: none !important;
 }

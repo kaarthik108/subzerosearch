@@ -160,3 +160,17 @@ def render_sidebar():
                 st.write(f"- {file_name}")
         else:
             st.write("No files uploaded yet.")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        if st.button("Reset", key="reset_button"):
+            # Clear all query parameters
+            st.query_params.clear()
+            st.session_state["chat_mode"] = False
+            st.session_state["uploaded_files"] = []
+            st.session_state["folder_path"] = None
+            st.rerun()

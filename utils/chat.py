@@ -85,9 +85,17 @@ class ChatHandler:
     def _perform_search(self, query: str):
         """Perform search operation"""
         try:
-            file_paths = get_file_paths(
-                st.session_state.get("folder_path", "")
-            )
+            folder_path = st.query_params.get(
+                'folder_path', None) or st.session_state.get("folder_path", "")
+            if not folder_path:
+                raise ValueError(
+                    "Please upload the resumes")
+
+            # Ensure folder_path is a string and properly formatted
+            folder_path = str(folder_path).strip().strip('"').strip("'")
+            logger.info(f"Using folder path: {folder_path}")
+
+            file_paths = get_file_paths(folder_path)
             logger.info(f"File paths: {file_paths}")
 
             filter_conditions = [

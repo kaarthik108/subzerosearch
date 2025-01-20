@@ -60,14 +60,17 @@ class ATSApplication:
         )
 
         if uploaded_files:
-            # Wrap the button in a container and use columns for centering
-            col1, col2, col3 = st.columns([1, 2, 1])
+            # Adjust the column widths for centering
+            # Make all columns equal width
+            col1, col2, col3 = st.columns([2, 6, 2])  # Wider center column
+
             with col2:
                 button_container = st.empty()
                 success_messages = st.empty()
 
                 if not st.session_state.get('uploading', False):
-                    if button_container.button("Upload Resumes"):
+                    # Use Streamlit's button and center it using columns
+                    if st.button("Upload Resumes", key="upload_button"):
                         st.session_state.uploading = True
                         button_container.empty()
 
