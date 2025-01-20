@@ -67,7 +67,7 @@ class ATSApplication:
 
                 if not st.session_state.get('uploading', False):
                     # Use Streamlit's button and center it using columns
-                    if st.button("Upload Resumes", key="upload_button", disabled=st.session_state.get('chat_mode', False)):
+                    if st.button("Upload Resumes", key="upload_button", disabled=st.session_state.get('uploading', False)):
                         st.session_state.uploading = True
                         button_container.empty()
 
@@ -95,7 +95,6 @@ class ATSApplication:
                             st.rerun()
                         finally:
                             spinner.empty()
-                            st.session_state.uploading = False
 
     def render_chat_ui(self):
         """Render chat interface"""

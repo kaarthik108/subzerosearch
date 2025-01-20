@@ -168,4 +168,5 @@ def render_sidebar():
             st.session_state["uploaded_files"] = []
             st.session_state["folder_path"] = None
             st.cache_data.clear()
+            st.cache_resource.clear()
             st.rerun()
