@@ -11,7 +11,8 @@ class SnowflakeConfig:
     DATABASE: str = st.secrets["DATABASE"]
     SCHEMA: str = st.secrets["SCHEMA"]
     STAGE: str = "docs"
-    SEARCH_SERVICE: str = "CC_SEARCH_SERVICE_CS"
+    SEARCH_SERVICE: str = "sub_zero_search"
+    CHUNK_TABLE: str = "chunks_table"
 
 
 class SnowflakeConnection:

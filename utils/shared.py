@@ -53,14 +53,14 @@ def upload_to_snowflake(file_name, file_data):
         parsed_content = md.convert(temp_file_path)
 
         insert_query = f"""
-        INSERT INTO docs_chunks_table (relative_path, size, file_url, scoped_file_url, chunk)
+        INSERT INTO {SnowflakeConfig.CHUNK_TABLE} (relative_path, size, file_url, scoped_file_url, chunk)
         SELECT relative_path, 
                size,
                file_url, 
-               build_scoped_file_url(@docs, relative_path) AS scoped_file_url,
+               build_scoped_file_url(@{SnowflakeConfig.STAGE}, relative_path) AS scoped_file_url,
                func.chunk AS chunk
         FROM 
-            directory(@docs),
+            directory(@{SnowflakeConfig.STAGE}),
         TABLE(text_chunker (TO_VARCHAR('{parsed_content.text_content}'))
         ) as func
         WHERE relative_path LIKE 'resume/%/{random_string}/%.pdf';
@@ -79,7 +79,7 @@ def get_file_paths(folder_path):
     session = SnowflakeConnection.get_connection()
     list_query = f"""
     SELECT DISTINCT relative_path 
-    FROM docs_chunks_table 
+    FROM {SnowflakeConfig.CHUNK_TABLE} 
     WHERE relative_path LIKE '{folder_path}/%';
     """
     result = session.sql(list_query).collect()
