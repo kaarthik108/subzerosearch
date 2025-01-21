@@ -1,6 +1,6 @@
 # SubZeroSearch 🧊
 
-A lightning-fast, AI-powered Applicant Tracking System built on Snowflake's Data Cloud. Winner of [Hackathon Name] 2025.
+A lightning-fast, AI-powered Applicant Tracking System built on Snowflake's Data Cloud.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
