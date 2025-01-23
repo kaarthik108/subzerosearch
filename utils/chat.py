@@ -160,7 +160,7 @@ class ChatHandler:
             response_placeholder.markdown(f"""
                 <div class="message-wrapper assistant">
                     <div class="avatar assistant-avatar">
-                        <img src="{st.secrets['LOGO_URL']}" alt="Assistant Logo"/>
+                        <span>🧊</span>
                     </div>
                     <div class="message-content">{response if chunk else "Loading..."}</div>
                 </div>

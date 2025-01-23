@@ -38,8 +38,7 @@ class ATSApplication:
         st.markdown(
             f'''
             <div class="brand-logo">
-                <img src="{st.secrets['LOGO_URL']}" class="logo-image" alt="SubZeroSearch Logo"/>
-                <span class="title">SubZeroSearch</span>
+                <span class="title">🧊 SubZeroSearch</span>
             </div>
             ''',
             unsafe_allow_html=True
@@ -109,8 +108,7 @@ class ATSApplication:
             <div class="header-section">
                 <div class="chat-header-content">
                     <div class="brand-logo">
-                        <img src="{st.secrets['LOGO_URL']}" class="logo-image" alt="SubZeroSearch Logo"/>
-                        <span class="chat-title">SubZeroSearch</span>
+                        <span class="chat-title">🧊 SubZeroSearch</span>
                     </div>
                 </div>
             </div>
@@ -125,7 +123,7 @@ class ATSApplication:
 
             role_class = "user" if message["role"] == "user" else "assistant"
             avatar_content = '<div class="user-img"></div>' if message[
-                "role"] == "user" else f'<img src="{st.secrets["LOGO_URL"]}" alt="Assistant Logo"/>'
+                "role"] == "user" else f'<span>🧊</span>'
             avatar_class = "user-avatar" if message["role"] == "user" else "assistant-avatar"
 
             st.markdown(f"""
@@ -188,7 +186,7 @@ class ATSApplication:
                 f"""
                 <div class="message-wrapper assistant">
                     <div class="avatar assistant-avatar">
-                        <img src="{st.secrets['LOGO_URL']}" alt="Assistant Logo"/>
+                        <span>🧊</span>
                     </div>
                     <div class="message-content">Loading...</div>
                 </div>
