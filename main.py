@@ -1,6 +1,6 @@
 import logging
 import streamlit as st
-from utils.shared import upload_to_snowflake, render_sidebar
+from utils.shared import append_folder_path, upload_to_snowflake, render_sidebar
 import time
 from utils.snowflake_utils import SnowflakeConnection
 from utils.ui import UIManager
@@ -54,6 +54,13 @@ class ATSApplication:
             accept_multiple_files=True,
             key="resume_uploader"
         )
+
+        if st.button("Test with Sample Data", key="test_data_button"):
+            st.session_state['folder_path'] = st.session_state['default_folder_path']
+            st.query_params.folder_path = st.session_state['default_folder_path']
+            append_folder_path(st.session_state['default_folder_path'])
+            st.session_state["chat_mode"] = True
+            st.rerun()
 
         if uploaded_files:
             # Adjust the column widths for centering

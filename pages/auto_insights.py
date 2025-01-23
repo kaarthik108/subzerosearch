@@ -21,16 +21,6 @@ class ResumeAnalytics:
     def __init__(self, folder_path, prompt):
         self.folder_path = folder_path
         self.prompt = prompt
-        self.session = None
-        self.search_service = None
-
-    @st.cache_resource
-    def get_snowflake_connection(_self):
-        logger.info("Establishing Snowflake connection.")
-        _self.session = SnowflakeConnection.get_connection()
-        _self.search_service = SnowflakeConnection.get_search_service(
-            _self.session)
-        return _self.session
 
     @st.cache_data
     def get_ai_insights(_self):
@@ -40,7 +30,7 @@ class ResumeAnalytics:
 
         try:
             status_text.text("Connecting to database...")
-            session = _self.get_snowflake_connection()
+            session = SnowflakeConnection.get_connection()
             progress_bar.progress(20)
 
             progress_bar.progress(40)
@@ -53,7 +43,8 @@ class ResumeAnalytics:
                 status_text.text("Analyzing resume contents...")
                 filter_conditions = [
                     {"@eq": {"RELATIVE_PATH": path}} for path in file_paths]
-                search_response = _self.search_service.search(
+                search_response = SnowflakeConnection.get_search_service(
+                    session).search(
                     query=_self.prompt,
                     columns=["chunk"],
                     filter={
@@ -244,7 +235,7 @@ class ResumeAnalytics:
 
 
 if __name__ == "__main__":
-    if 'folder_path' in st.session_state and st.session_state['folder_path']:
+    if ('folder_path' in st.session_state and st.session_state['folder_path']):
         st.query_params.folder_path = st.session_state['folder_path']
         logger.info("Starting Resume Analytics Dashboard.")
         analytics = ResumeAnalytics(

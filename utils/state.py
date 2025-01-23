@@ -10,7 +10,7 @@ class SessionStateManager:
         default_states = {
             "chat_mode": False,
             "uploaded_files": [],
-            # "folder_path": "resume/2025-01-20/jMfhwsDA",
+            "default_folder_path": "resume/2025-01-24/ISwfEXWb",
             "folder_path": None,
             "uploading": False
         }
@@ -31,3 +31,6 @@ class SessionStateManager:
                     "source_documents": {}
                 }
             ]
+
+        if 'folder_path' in st.session_state:
+            st.query_params.folder_path = st.session_state['folder_path']

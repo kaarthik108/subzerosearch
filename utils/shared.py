@@ -10,13 +10,15 @@ from utils.logging_utils import setup_logging
 
 logger = setup_logging()
 
-# if 'folder_path' not in st.session_state:
-#     st.session_state['folder_path'] = "resume/2025-01-17/OS1VsLBk"
-
 
 def sanitize_filename(file_name):
     """Sanitize the filename for compatibility with Snowflake."""
     return re.sub(r"[^a-zA-Z0-9_.]", "_", file_name)
+
+
+def append_folder_path(folder_path):
+    files = get_file_paths(folder_path)
+    st.session_state["uploaded_files"].extend(files)
 
 
 def upload_to_snowflake(file_name, file_data):
