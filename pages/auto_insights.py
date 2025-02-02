@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from snowflake.cortex import complete
 import json
 import re
 from utils.shared import prompt, render_sidebar, get_file_paths
@@ -24,7 +23,7 @@ class ResumeAnalytics:
 
     @st.cache_data
     def get_ai_insights(_self):
-        """Fetch AI-generated insights using Snowflake Cortex."""
+        """Fetch AI-generated insights using Snowflake Cortex via a SQL query."""
         progress_bar = st.progress(0)
         status_text = st.empty()
 
@@ -44,7 +43,8 @@ class ResumeAnalytics:
                 filter_conditions = [
                     {"@eq": {"RELATIVE_PATH": path}} for path in file_paths]
                 search_response = SnowflakeConnection.get_search_service(
-                    session).search(
+                    session
+                ).search(
                     query=_self.prompt,
                     columns=["chunk"],
                     filter={
@@ -55,26 +55,28 @@ class ResumeAnalytics:
 
                 status_text.text("Generating AI insights...")
                 results = search_response.results
-                context_str = "\n".join([f"Context document {i+1}: {r['chunk']}"
-                                        for i, r in enumerate(results)])
-
-                options = {
-                    "max_tokens": 10000,
-                    "temperature": 0.01,
-                    "top_p": 0.9
-                }
-                no_of_candidates = len(file_paths)
-
-                base_prompt = f"""Analyze {no_of_candidates} resumes and provide structured insights in JSON format. The response must be ONLY valid JSON with no additional text or formatting. \n\n
-                {_self.prompt}
-                """
-
-                response = complete(
-                    model=AppConfig.RESPONSE_MODEL,
-                    prompt=base_prompt + "\n\n" + "Context from resumes: " + context_str,
-                    options=options,
-                    session=session
+                context_str = "\n".join(
+                    [f"Context document {i+1}: {r['chunk']}" for i,
+                        r in enumerate(results)]
                 )
+
+                no_of_candidates = len(file_paths)
+                base_prompt = (
+                    f"Analyze {no_of_candidates} resumes and provide structured insights in JSON format. "
+                    "The response must be ONLY valid JSON with no additional text or formatting.\n\n" +
+                    _self.prompt
+                )
+
+                sql_query = (
+                    "SELECT SNOWFLAKE.CORTEX.COMPLETE("
+                    f"'{AppConfig.RESPONSE_MODEL}', "
+                    "CONCAT("
+                    f"'{base_prompt}\\n\\nContext from resumes: ', "
+                    f"'{context_str}'"
+                    "))"
+                )
+
+                response = session.sql(sql_query).collect()[0][0]
 
                 progress_bar.progress(100)
                 status_text.empty()
